@@ -1,0 +1,103 @@
+# lua-xmlreader
+
+Provides the [XmlReader 
+API](http://dotgnu.org/pnetlib-doc/System/Xml/XmlReader.html)
+to Lua applications using [LibXML2](http://xmlsoft.org).  `XmlReader` is an 
+API introduced in C# that is arguably easier to use than SAX.  It provides a 
+pull interface where you control the reader, which is a cursor moving along 
+the document. Call methods such as `reader:name()` to get information about 
+the current node and `reader:read()` to advance to the next.  This has the 
+advantage versus a tree model such as DOM that the whole document does not 
+need to be loaded into memory at once. The many articles and tutorials 
+available online referring to XmlReader/XmlTextReader in C#, Java or other 
+languages should all be useful if you want to better understand this method of 
+handling XML. `lua-xmlreader` depends on the libxml2 library.
+
+## Project links
+* [Download](http://luaforge.net/projects/lua-xmlreader/)
+* [Documentation](http://asbradbury.org/projects/lua-xmlreader/doc/)
+* [Source](http://github.com/asb/lua-xmlreader/)
+
+## Release history
+* lua-xmlreader-0.1 (2008-01-25)
+  * first public release
+
+## Related links
+* [LibXML2](http://xmlsoft.org)
+* [DotGNU XmlReader](http://dotgnu.org/pnetlib-doc/System/Xml/XmlReader.html)
+
+## Example
+Below is a fairly simple example demonstrating how you extract information 
+from an XML document using an XmlReader. It prints each element along with its 
+attributes.
+
+    #! /usr/bin/env lua
+    require('xmlreader')
+
+    local example_xml = [[
+    <?xml version="1.0" encoding="utf-8"?>
+    <library>
+      <book id='1'>
+        <title>Green Eggs and Ham</title>
+        <author>Dr. Seuss</author>
+      </book>
+      <book id='2'>
+        <title>Where the Wild Things Are</title>
+        <author>Maurice Sendak</author>
+      </book>
+    </library>
+    ]]
+
+    local r = assert(xmlreader.from_string(example_xml))
+
+    while (r:read()) do
+      local leadingws = ('    '):rep(r:depth())
+      if (r:node_type() == 'element') then
+        io.write(('%s%s:'):format(leadingws, r:name()))
+        while (r:move_to_next_attribute()) do
+          io.write((' %s=%q'):format(r:name(), r:value()))
+        end
+        io.write('\n')
+      end
+    end
+
+When executed, this would output:
+
+    library:
+        book: id="1"
+            title:
+            author:
+        book: id="2"
+            title:
+            author:
+
+## License
+lua-xmlreader is distributed under the MIT license.
+
+    Copyright (c) 2008 A.S. Bradbury
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+## Contact
+Author: A.S. Bradbury  
+Email: <asb@asbradbury.org>  
+Homepage: <http://asbradbury.org/>
