@@ -5,7 +5,7 @@ LUALIB= $(LUA)/lib
 LUABIN= $(LUA)/bin
 
 # no need to change anything below here
-CFLAGS= $(INCS) $(DEFS) $(WARN) -O2
+CFLAGS= $(INCS) $(DEFS) $(WARN) -fPIC -O2
 WARN= -Wall
 INCS= -I$(LUAINC) -I/usr/include/libxml2/
 LIBS= -lxml2
@@ -22,9 +22,6 @@ $(SOS): $(OBJS)
 .PHONY: clean doc
 clean:
 	rm -f $(OBJS) $(SOS) core core.* a.out
-
-doc:
-	lua doc/extract_doc.lua xmlreader.c > doc/xmlreader.html
 
 tar: clean
 	git archive --format=tar --prefix=lua-xmlreader-$(VERSION)/ v$(VERSION) | gzip > lua-xmlreader-$(VERSION).tar.gz
