@@ -1125,6 +1125,9 @@ static struct { const char *key; xmlParserOption value; } parser_opts[] = {
 
 int luaopen_xmlreader(lua_State *L) {
   int i;
+
+  LIBXML_TEST_VERSION
+
   lua_pushlightuserdata(L, &parser_opt_table);
   lua_newtable(L);
   for (i=0; parser_opts[i].key != NULL; i++) {
