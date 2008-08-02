@@ -6,8 +6,7 @@
  * error */
 /* Mostly ripped from code in parser.c and error.c in libxml. Not ideal, but 
  * it seems impossible to hook into libxml's error string generation */
-int xml_push_error(lua_State *L, xmlErrorPtr err)
-{
+int xml_push_error(lua_State *L, xmlErrorPtr err) {
   if (err==NULL)
     luaL_error(L, "a NULL error was raised. Should not happen");
 
@@ -26,23 +25,20 @@ int xml_push_error(lua_State *L, xmlErrorPtr err)
   if ((node != NULL) && (node->type == XML_ELEMENT_NODE))
     name = node->name;
 
-  if (file != NULL)
-  {
+  if (file != NULL) {
     lua_pushfstring(L, "%s:%d: ", file, line);
     luaL_addvalue(B);
-  }
-  else if ((line != 0) && (domain == XML_FROM_PARSER))
-  {
+  } else if ((line != 0) && (domain == XML_FROM_PARSER)) {
     lua_pushfstring(L, "Entity: line %d: ", line);
     luaL_addvalue(B);
   }
-  if (name != NULL)
-  {
+
+  if (name != NULL) {
     lua_pushfstring(L, "element %s: ", name);
     luaL_addvalue(B);
   }
-  switch (domain)
-  {
+
+  switch (domain) {
     case XML_FROM_PARSER:
       luaL_addstring(B, "parser ");
       break;
