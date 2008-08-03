@@ -112,6 +112,9 @@ no associated namespace URI.
 Returns the namespace prefix associated with the current node or `nil` if it 
 is not available. e.g. the prefix for the element `<bk:book>` is `bk`.
 
+## `reader:xml_lang()`
+Returns a string giving the current `xml:lang` scope.
+
 ## `reader:value()`
 Returns the text value of the current node or `nil` if not available.
 
