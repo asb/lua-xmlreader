@@ -5,13 +5,7 @@
 
 #include "error.h"
 
-/* Definitions */
-
 typedef xmlTextReaderPtr xmlreader;
-
-/*?lua
-lib_name = "lua-xmlreader"
-?*/
 
 static const char *const xmlreader_types[] = {
   "none",
@@ -56,7 +50,6 @@ static const char *const xmlreader_properties[] = {
 #define LXMLREADER "xmlreader"
 
 /*** forward definitions ***/
-/* static void xmlreader_error_handler(void *out, xmlError *error); */
 static void xmlreader_pusherror(lua_State *L);
 
 /*** helpers ***/
@@ -86,15 +79,6 @@ static xmlreader check_xmlreader(lua_State *L, int n) {
     lua_pushnil(L);\
     xmlreader_pusherror(L);\
     return 2; }
-/*?lua
-module "xmlreader"
-description "Implements the XMLReader API"
-?*/
-/*** constructors ***/
-
-/* See the constructors at the bottom using the new api */
-
-/*** destructor ***/
 
 static int xmlreader_gc(lua_State *L) {
   xmlreader *xrp = (xmlreader*)luaL_checkudata(L, 1, LXMLREADER);
@@ -117,14 +101,7 @@ static int xmlreader_tostring(lua_State *L) {
 
 /*** iterators ***/
 
-/*?lua
-signature "reader:read()"
-description [[
- Moves the position of reader to the next node in the stream. Returns true if 
- the node was read successfully, false if there are no more nodes to be read 
- and nil, err_msg if there is an error
- ]]
-?*/
+/* reader:read() */
 static int xmlreader_read(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -140,15 +117,7 @@ static int xmlreader_read(lua_State *L) {
 }
 
 #define ERR_MSG "current node is neither an element nor attribute, or has no child nodes"
-/* TODO: Document differences between reader_inner_xml and read_outer_xml */
-/*?lua
-signature "reader:read_inner_xml()"
-description [[
-  Reads the contents of the current node, including child nodes and markup.  
-  Returns a string containing the XML content or nil, err_msg if the current 
-  node is neither an element nor attribute, or has no child nodes.
-  ]]
-?*/
+/* reader:read_inner_xml() */
 static int xmlreader_read_inner_xml(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *str = (char*)xmlTextReaderReadInnerXml(xr);
@@ -163,14 +132,7 @@ static int xmlreader_read_inner_xml(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:read_outer_xml()"
-description [[
-  Reads the contents of the current node, including child nodes and markup.  
-  Returns a string containing the XML content or nil, err_msg if the current 
-  node is neither an element nor attribute, or has no child nodes.
-  ]]
-?*/
+/* reader:read_outer_xml() */
 static int xmlreader_read_outer_xml(lua_State *L)
 {
   xmlreader xr = check_xmlreader(L, 1);
@@ -187,14 +149,7 @@ static int xmlreader_read_outer_xml(lua_State *L)
 }
 #undef ERR_MSG
 
-/*?lua
-signature "reader:read_string()"
-description [[
-  Reads the contents of an element or a text node as a string. Returns a 
-  string contraining the contents of the Element or Text node, or nil, err_msg 
-  if the reader is positioned on any other type of node
-  ]]
-?*/
+/* reader:read_string() */
 static int xmlreader_read_string(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *str = (char*)xmlTextReaderReadString(xr);
@@ -209,15 +164,7 @@ static int xmlreader_read_string(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:read_attribute_value()"
-description [[
-  Parses an attribute value into one or more Text and EntityReference nodes.  
-  Returns true in case of success, false if the reader was not positioned on 
-  an attribute node or all the attribute values have been read, or nil, 
-  err_msg in case of error.
-  ]]
-?*/
+/* reader:read_attribute_value() */
 static int xmlreader_read_attribute_value(lua_State *L)
 {
   xmlreader xr = check_xmlreader(L, 1);
@@ -227,13 +174,8 @@ static int xmlreader_read_attribute_value(lua_State *L)
 }
 
 /*** attributes of the node ***/
-/*?lua
-signature "reader:attribute_count()"
-description [[
-  The number of attributes of the current node. Returns nil, err_msg in case 
-  of error.
-  ]]
-?*/
+
+/* reader:attribute_count() */
 static int xmlreader_attribute_count(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   int ret = xmlTextReaderAttributeCount(xr);
@@ -247,12 +189,7 @@ static int xmlreader_attribute_count(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:depth()"
-description [[
-  The depth of the node in the tree. Returns nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:depth() */
 static int xmlreader_depth(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   int ret = xmlTextReaderDepth(xr);
@@ -266,13 +203,7 @@ static int xmlreader_depth(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:has_attributes()"
-description [[
-  Returns a boolean indicating whther the current node has attributes. Returns 
-  nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:has_attributes() */
 static int xmlreader_has_attributes(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -280,13 +211,7 @@ static int xmlreader_has_attributes(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:has_value()"
-description [[
-  Returns a boolean indicating whther the current node can have an associated  
-  text value. Returns nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:has_value() */
 static int xmlreader_has_value(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -294,27 +219,15 @@ static int xmlreader_has_value(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:is_default()"
-description [[
-  Returns a boolean indicating whther the current node is an attribute that 
-  was generated from the default value defined in the DTD or schema. Returns 
-  nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:is_default() */
 static int xmlreader_is_default(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
   int ret = xmlTextReaderIsDefault(xr);
   BOOL_OR_ERROR(L, ret);
 }
-/*?lua
-signature "reader:is_empty_element()"
-description [[
-  Returns a boolean indicating whether the current node is empty element.  
-  Returns nil, err_msg in case of error.
-  ]]
-?*/
+
+/* reader:is_empty_element() */
 static int xmlreader_is_empty_element(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -322,14 +235,7 @@ static int xmlreader_is_empty_element(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*TODO: Expose the list of possible node types and document them */
-/*?lua
-signature "reader:node_type()"
-description [[
-  Returns the node type of the current node. Returns nil, err_msg in case of 
-  error.
-  ]]
-?*/
+/* reader:node_type() */
 static int xmlreader_node_type(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -344,13 +250,7 @@ static int xmlreader_node_type(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:quote_char()"
-description [[
-  Returns the quotation mark character used to enclose the value of an 
-  attribute, " or '. Returns nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:quote_char() */
 static int xmlreader_quote_char(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -365,14 +265,7 @@ static int xmlreader_quote_char(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:read_state()"
-description [[
-  Returns the read state of the reader, which is one of "initial",
-  "interactive", "error", "eof", "closed", "reading". Returns nil, err_msg in 
-  case of error.
-  ]]
-?*/
+/* reader:read_state() */
 static int xmlreader_read_state(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -388,14 +281,7 @@ static int xmlreader_read_state(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:is_namespace_declaration()"
-description [[
-  Returns a boolean indicating whether the current node is a namespace 
-  declaration rather than a regular attribute. Returns nil, err_msg in case of 
-  error.
-  ]]
-?*/
+/* reader:is_namespace_declaration() */
 static int xmlreader_is_namespace_declaration(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -403,13 +289,7 @@ static int xmlreader_is_namespace_declaration(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:base_uri()"
-description [[
-  Returns the base URI of the current node or nil, err_msg if it is not 
-  available
-  ]]
-?*/
+/* reader:base_uri() */
 static int xmlreader_base_uri(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *uri = (char*)xmlTextReaderBaseUri(xr);
@@ -424,13 +304,7 @@ static int xmlreader_base_uri(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:local_name()"
-description [[
-  Returns the local name of the node. Returns nil, "not available" if not 
-  available
-  ]]
-?*/
+/* reader:local_name() */
 static int xmlreader_local_name(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *ln = (char*)xmlTextReaderLocalName(xr);
@@ -445,13 +319,7 @@ static int xmlreader_local_name(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:name()"
-description [[
-  Returns the qualified name of the current node, which is equivalent to 
-  'Prefix:LocalName'. Returns nil, "not available" if not available.
-  ]]
-?*/
+/* reader:name() */
 static int xmlreader_name(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *name = (char*)xmlTextReaderName(xr);
@@ -466,14 +334,7 @@ static int xmlreader_name(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:namespace_uri()"
-description [[
-  Returns the namespace URI associated with the current node. Returns nil, 
-  "not available" if there is no namespace URI associated with the current 
-  node.
-  ]]
-?*/
+/* reader:namespace_uri() */
 static int xmlreader_namespace_uri(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *nsuri = (char*)xmlTextReaderNamespaceUri(xr);
@@ -488,13 +349,7 @@ static int xmlreader_namespace_uri(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:prefix()"
-description [[
-  Returns the namespace prefix associated with the current node or nil, "not 
-  available" if not available.
-  ]]
-?*/
+/* reader:prefix() */
 static int xmlreader_prefix(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *prefix = (char*)xmlTextReaderPrefix(xr);
@@ -509,13 +364,7 @@ static int xmlreader_prefix(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:xml_lang()"
-description [[
-  Returns the xml:lang scope within which the current node resides, or nil, 
-  err_msg if no xml:lang value exists.
-  ]]
-?*/
+/* reader:xml_lang() */
 static int xmlreader_xml_lang(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *xml_lang = (char*)xmlTextReaderXmlLang(xr);
@@ -532,13 +381,7 @@ static int xmlreader_xml_lang(lua_State *L) {
 
 /* ignore xmlTextReaderConstString */
 
-/*?lua
-signature "reader:value()"
-description [[
-  Returns the text value of the current node. Returns nil, "not available" if 
-  no value is available.
-  ]]
-?*/
+/* reader:value() */
 static int xmlreader_value(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *value = (char*)xmlTextReaderValue(xr);
@@ -554,13 +397,8 @@ static int xmlreader_value(lua_State *L) {
 }
 
 /*** methods of XmlTextReader ***/
-/*?lua
-signature "reader:close()"
-description [[
-  Closes the xmlreader instance. Returns true in case of success and nil, 
-  err_msg in case of error.
-  ]]
-?*/
+
+/* reader:close() */
 static int xmlreader_close(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -575,15 +413,7 @@ static int xmlreader_close(lua_State *L) {
   }
 }
 
-/* Wraps xmlTextReaderGetAttributeNo and xmlTextReaderGetAttribute */
-/*?lua
-signature "reader:get_attribute(name|idx)"
-description [[
-  Returns the value of the attribute with either the specified qualified name 
-  of the specified zero-based index of the attribute relative to the 
-  containing element. In case of error returns nil, err_msg.
-  ]]
-?*/
+/* reader:get_attribute(name|idx) */
 static int xmlreader_get_attribute(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   char *attr;
@@ -607,13 +437,7 @@ static int xmlreader_get_attribute(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:get_attribute_ns(nsuri)"
-description [[
-  Returns the value of the attribute specified by the given namespace URI.  
-  Returns nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:get_attribute_ns(nsuri) */
 static int xmlreader_get_attribute_ns(lua_State *L)
 {
   xmlreader xr = check_xmlreader(L, 1);
@@ -632,16 +456,7 @@ static int xmlreader_get_attribute_ns(lua_State *L)
   }
 }
 
-/* ignore xmlTextReaderGetRemainder as it returns xmlParserInputBufferPtr.  
- * Also, the documentation seems to indicate it's a bad function anyway */
-/*?lua
-signature "reader:lookup_namespace(prefix)"
-description [[
-  Resolves a namespace prefix in the scope of the current element. Returns a 
-  string containing the namespace URI to which the prefix maps or nil, err_msg 
-  in case of error. Give the empty string to return the default namespace.
-  ]]
-?*/
+/* reader:lookup_namespace() */
 static int xmlreader_lookup_namespace(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -657,17 +472,7 @@ static int xmlreader_lookup_namespace(lua_State *L) {
   }
 }
 
-/* wraps both xmlTextReaderMoveToAttributeNo and xmlTextReaderMoveToAttribute 
- * */
-/*?lua
-signature "reader:move_to_attribute(name|idx)"
-description [[
-  Moves the current position to the attribute with the specified qualified 
-  name or the specified zero-based index relative to the containing element.  
-  Returns nil, err_msg in case of error, true in case of success and false if 
-  not found.
-  ]]
-?*/
+/* reader:move_to_attribute(name|idx) */
 static int xmlreader_move_to_attribute(lua_State *L)
 {
   xmlreader xr = check_xmlreader(L, 1);
@@ -684,14 +489,7 @@ static int xmlreader_move_to_attribute(lua_State *L)
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:move_to_attribute_ns(localname, nsuri)"
-description [[
-  Moves the current position to the attribute with the specified local name 
-  and namespace URI. Returns true in case of success, false if not found and 
-  nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:move_to_attribute_ns(localname, nsuri) */
 static int xmlreader_move_to_attribute_ns(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   const xmlChar *localname = (xmlChar*)luaL_checkstring(L, 2);
@@ -701,14 +499,7 @@ static int xmlreader_move_to_attribute_ns(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:move_to_first_attribute()"
-description [[
-  Moves the current position to the first attribute associated with the 
-  current node. Returns true in case of success, false if not found and nil, 
-  err_msg in case of error.
-  ]]
-?*/
+/* reader:move_to_first_attribute() */
 static int xmlreader_move_to_first_attribute(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -716,14 +507,7 @@ static int xmlreader_move_to_first_attribute(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:move_to_next_attribute()"
-description [[
-  Moves the current position to the next attribute associated with the current 
-  node. Returns true in case of success, false if not found and nil, err_msg 
-  in case of error.
-  ]]
-?*/
+/* reader:move_to_next_attribute() */
 static int xmlreader_move_to_next_attribute(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -731,14 +515,7 @@ static int xmlreader_move_to_next_attribute(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/*?lua
-signature "reader:move_to_element()"
-description [[
-  Moves the current position to the node that contains the current Attribute 
-  node. Returns true in case of success, false if not moved (so the reader was  
-  not positioned on an Atrtribute node) and nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:move_to_element() */
 static int xmlreader_move_to_element(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -746,14 +523,7 @@ static int xmlreader_move_to_element(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
 
-/* xmlTextReaderNormalization not wrapped, because it's always true */
-/*?lua
-signature "reader:encoding()"
-description [[
-  Returns the encoding of the current document or nil, err_msg in case of 
-  error.
-  ]]
-?*/
+/* reader:encoding() */
 static int xmlreader_encoding(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   const char *enc = (char*)xmlTextReaderConstEncoding(xr);
@@ -787,14 +557,7 @@ static int xmlreader_get_parser_property(lua_State *L) {
   }
 }
 
-/* xmlTextReaderCurrentNode unimplemented - no xmlNodePtr support yet.  
- * Uncertain it's even a sensible thing to expose */
-/*?lua
-signature "reader:line_number()"
-description [[
-  Returns the current line number, or 0 if not available.
-  ]]
-?*/
+/* reader:line_number() */
 static int xmlreader_line_number(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -808,12 +571,7 @@ static int xmlreader_line_number(lua_State *L) {
   return 1;
 }
 
-/*?lua
-signature "reader:column_number()"
-description [[
-  Returns the current column number or 0 if not available.
-  ]]
-?*/
+/* reader:column_number() */
 static int xmlreader_column_number(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -826,22 +584,7 @@ static int xmlreader_column_number(lua_State *L) {
   return 1;
 }
 
-/* xmlTextReaderPreserve and xmlTextReaderPreservePattern not wrapped for the 
- * same reason as xmlTextReaderCurrentNode */
-
-/* xmlTextReaderCurrentDoc unimplemented - do I want these "hacking interface" 
- * methods? */
-
-/* xmlTextReaderExpand unimplemented */
-
-/*?lua
-signature "reader:next_node()"
-description [[
-  Skip to the node following the current one in document order while avoiding 
-  the subtree if any. Returns true if the node was read successfully, false if 
-  there are no more nodes to read and nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:next_node() */
 static int xmlreader_next_node(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -849,24 +592,8 @@ static int xmlreader_next_node(lua_State *L) {
   BOOL_OR_ERROR(L, ret);
 }
  
-/* "Implemented only for readers built on a document", so comment out for now
-static int xmlreader_next_sibling(lua_State *L)
-{
-  xmlreader xr = check_xmlreader(L, 1);
 
-  int ret = xmlTextReaderNextSibling(xr);
-  BOOL_OR_ERROR(L, ret);
-}
-*/
-
-/*?lua
-signature "reader:is_valid()"
-description [[
-  Returns a boolean indicating the validity status as retrieved from the 
-  parser context. Returns true if valid, false if not valid and nil, err_msg 
-  in case of error.
-  ]]
-?*/
+/* reader:is_valid() */
 static int xmlreader_is_valid(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -876,13 +603,7 @@ static int xmlreader_is_valid(lua_State *L) {
 
 /* TODO RelaxNG and Schema validation methods unimplemented */
 
-/*?lua
-signature "reader:xml_version()"
-description [[
-  Returns the XML version of the document being read or nil, err_msg in case 
-  of error.
-  ]]
-?*/
+/* reader:xml_version() */
 static int xmlreader_xml_version(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
   const char *xml_version = (char*)xmlTextReaderConstXmlVersion(xr);
@@ -896,13 +617,7 @@ static int xmlreader_xml_version(lua_State *L) {
   }
 }
 
-/*?lua
-signature "reader:is_standalone()"
-description [[
-  Returns a boolean indicating whether the document was declared to be 
-  standalone or nil, err_msg in case of error.
-  ]]
-?*/
+/* reader:is_standalone() */
 static int xmlreader_is_standalone(lua_State *L) {
   xmlreader xr = check_xmlreader(L, 1);
 
@@ -912,13 +627,7 @@ static int xmlreader_is_standalone(lua_State *L) {
 
 /*** index lookup ***/
 
-/*?lua
-signature "reader:bytes_consumed()"
-description [[
-  Returns the current index of the parser used by the reader, relative to the 
-  start of the current entity.
-  ]]
-?*/
+/* reader:bytes_consumed() */
 static int xmlreader_bytes_consumed(lua_State *L) { xmlreader xr = check_xmlreader(L, 1);
   long ret = xmlTextReaderByteConsumed(xr);
   if (ret != -1) {
@@ -956,12 +665,7 @@ static int get_parser_option(lua_State *L) {
 
 /*** new, more complete APIs for simpler creation and reuse of readers ***/
 
-/*?lua
-signature "xmlreader.from_file(filename [, encoding, options])"
-description [[
-  Parse an XML from the filesystem or the network (if you specify a URL).
-  ]]
-?*/
+/* xmlreader.from_file(filename [,encoding] [,options]) */
 static int xmlreader_from_file(lua_State *L) {
   const char *fn = luaL_checkstring(L, 1);
   const char *enc = luaL_optstring(L, 2, NULL);
@@ -1003,12 +707,7 @@ xmlreader _xmlreader_from_string(const char *buffer, int size, const char *URL, 
   return (reader);
 }
 
-/*?lua
-signature "xmlreader.from_string(str [, base_url, encoding, options])"
-description [[
-  Creates an xmlreader object by parsing the given XML document.
-  ]]
-?*/
+/* xmlreader.from_string(str [, base_url] [, encoding] [,options]) */
 static int xmlreader_from_string(lua_State *L) {
   const char *str = luaL_checkstring(L, 1);
   const char *url = luaL_optstring(L, 2, NULL);
