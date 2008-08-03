@@ -1,0 +1,216 @@
+# `xmlreader`
+Provides the XmlReader interface. All functions may return `nil` plus an error 
+message if LibXML2 reports an error.
+
+# Iterators
+
+## `reader:read()`
+Moves the position of `reader` to the next node in the stream. Returns `true` 
+if the node was read successfully, `false` if there are no more nodes to be 
+read.
+
+## `reader:read_inner_xml()`
+Reads the contents of the current node's child nodes, does not include the 
+tags of the current node.  Returns a string containing the XML content, or 
+`nil` plus an error message if the current node is neither an element nor 
+attribute, or has no child nodes.
+
+## `reader:read_outer_xml()`
+Reads the contents of the current node, including child nodes and markup. 
+Returns a string containing the XML content, or `nil` plus an error message if 
+the current node is neither an element nor attribute, or has no child nodes.
+
+## `reader:read_string()`
+Reads the contents of an element of a text node as a string. Returns a string 
+or nil plus an error message if the reader is position on any other type of 
+node.
+
+## `reader:read_attribute_value()`
+Parses an attribute value into one or more Text and EntityReference nodes. 
+Returns `true` in case of success, `false` if the reader was not positioned on 
+an attribute node or all the attribute value have been read.
+
+# Retrieve information about the current node
+These methods do not move the reader.
+
+## `reader:attribute_count()`
+The number of attributes of the current node.
+
+## `reader:depth()`
+The depth of the node in the tree.
+
+## `reader:has_attributes`
+Returns a boolean indicating whether the current node has attributes.
+
+## `reader:has_value()`
+Returns a boolean indicating whether the current node can have an associated 
+text value.
+
+## `reader:is_default()`
+Returns a boolean indicating whether the current node is an attribute that was 
+generated from the default value defined in the DTD or schema.
+
+## `reader:is_empty_element()`
+Returns a boolean indicating whether the current node is an empty element.
+
+## `reader:node_type()`
+Returns the node type of the current node as a string. Possible types are:
+
+ * `none` returned if no read method has been called on `reader`, or no more 
+ nodes are available to be read.
+ * `element` an XML element, e.g. `<foo>`.
+ * `attribute` an attribute. e.g.  `href="http://example.com"`.
+ * `cdata` a CDATA section. e.g. `<![CDATA[escaped text]]>`.
+ * `entity reference` a reference to an entity. e.g. `&num`.
+ * `entity` an entity declaration, e.g. `<!ENTITY ...>`.
+ * `processing instruction` e.g. `<?pi test?>`.
+ * `comment` e.g. `<!-- a comment -->`
+ * `document` a document object that, as the root of the entire tree, provides 
+ access to the entire XML document.
+ * `doctype` e.g. `<!DOCTYPE ...>`
+ * `document fragment` associates a node or sub-tree within a document without 
+ actually being contained within the document.
+ * `notation` a notation in the document type declaration. e.g.  `<!NOTATION 
+ ...>`
+ * `whitespace` white space between markup.
+ * `significant whitespace` white space between markup in a mixed content 
+ model or white space within the `xml:space="preserve"` scope.
+ * `end element` an end element tag, e.g. `</foo>`
+ * `end entity`
+ * `xml declaration` e.g. `<?xml version="1.0"?>`
+
+## `reader:quote_char()`
+Returns the quotation mark character of an attribute - either `"` or `'`.
+
+## `reader:read_state()`
+Returns the read state of the reader as a string, which is one of `"initial"`, 
+`"interactive"`, `"error"`, `"eof"`, `"closed"` or `"reading"`.
+
+## `reader:is_namespace_declaration()`
+Returns a boolean indicating whether the current node is a namespace 
+declaration rather than a regular attribute.
+
+## `reader:base_uri()`
+Returns the base URI of the current node or `nil` if it is not available (e.g.  
+when parsing an in-memory string).  A networked XML document may be comprised 
+of chunks of data aggregated using various W3C standard inclusion mechanisms.  
+The base URI tells you where a particular node came from.
+
+## `reader:local_name()`
+Returns the local name of the node or `nil` if it is not available. e.g. the 
+local name for the element `<bk:book>` is `book`.
+
+## `reader:name()`
+Returns the qualified name of the current node. e.g. the qualified name for 
+the element `<bk:book>` is `bk:book`.
+
+## `reader:namespace_uri()`
+Returns the namespace URI associated with the current node or `nil` if it has 
+no associated namespace URI.
+
+## `reader:prefix()`
+Returns the namespace prefix associated with the current node or `nil` if it 
+is not available. e.g. the prefix for the element `<bk:book>` is `bk`.
+
+## `reader:value()`
+Returns the text value of the current node or `nil` if not available.
+
+## `reader:close()`
+Closes the `xmlreader` instance. Returns `true` or `nil` plus an error 
+message.
+
+## `reader:get_attribute(name|idx)`
+Returns the value of the attribute with either the specifed qualified name, or 
+the specified zero-based index of the attribute relative to the containing 
+element. e.g. `reader:get_attribute("id")` or `reader:get_attribute(0)`.
+
+## `reader:get_attribute_ns(local_name, nsuri)`
+Returns the value of the attribute specified by the given local name and 
+namespace URI.
+
+## `reader:lookup_namespace(prefix)`
+Resolves the namespace prefix in the scope of the current element. Returns a 
+string containing the namespace URI to which the prefix maps. Give the empty 
+string to get the default namespace.
+
+NOTE the convention is that if false is returned, the reader's position has 
+not changed.
+
+## `reader:move_to_attribute(name|idx)`
+Moves the position of `reader` to the attribute with the specified qualified 
+name or the specified zero-based index. Returns `true` in case of success and 
+`false` if the attribute is not found.
+
+## `reader:move_to_attribute_ns(localname, nsuri)`
+Moves the position of `reader` to the attribute with the specified local name 
+and namespace URI. Returns `true` in case of success and `false` if the 
+attribute is not found.
+
+## `reader:move_to_first_attribute()`
+Moves the position of `reader` to the first attribute of the current node.  
+Returns `true` in case of success (the current node contains at least 1 
+attribute) otherwise `false`.
+
+## `reader:move_to_next_attribute()`
+Moves the position of `reader` to the next attribute associated with the 
+current node. Returns `true` if the position has been moved to the next 
+attribute or `false` if there were no more attributes.
+
+## `reader:move_to_element()`
+Moves to the node that contains the current attribute node. Returns `true` in 
+case of success or `false` if the position is unchanged (`reader` was not 
+positioned on an attribute node).
+
+The following are extensions to the standard XmlReader API
+
+## `reader:line_number()`
+Returns the current line number, or `0` if not available.
+
+## `reader:column_name()`
+Returns the current column number, or `0` if not available.
+
+## `reader:next_node()`
+Slkip to the node following the current one in document order while avoiding 
+the subtree if any. Returns `true` if the node was reader successfully or 
+`false` if there are no more nodes to read.
+
+## `reader:is_valid()`
+Returns a boolean indicating the validity status as retrieved from teh parser 
+context.
+
+## `reader:xml_version()`
+Returns the XML version of the document being read as a string.
+
+## `reader:is_standalone()`
+Returns a boolean indicating whether the document was declarated to be 
+standalone.
+
+## `reader_bytes_consumed()`
+Returns the current index of the parser used by the reader relative to the 
+start of the current entity.
+
+Valid parser options are:
+
+* `recover` recover on errors
+* `noent` substitute entities
+* `dtdload` load the external subset
+* `dtdattr` default DTD attributes
+* `dtdvalid` validate with the DTD
+* `noerror` supress error reports
+* `nowarning` supress warning reports
+* `pedantic` pedantic error reporting
+* `noblanks` remove blank nodes
+* `sax1` use the SAX1 interface internally
+* `xinclude` implement XInclude substitution
+* `nonet` forbid network access
+* `nodict` do no reuse the context dictionary
+* `nsclean` remove redundant namespaces declarations
+* `nocdata` merge CDATA as text nodes
+* `noexincnode` do not generate XInclude START/END nodes
+* `compact` compact small text nodes
+
+## `xmlreader.from_file(filename [, encoding] [, options...])`
+Parse an XML file from the filesystem or the given URL.
+
+## `xmlreader.from_string(str [, base_url] [, encoding] [, options...])`
+Creates an `xmlreader` object by parsing the given XML document.

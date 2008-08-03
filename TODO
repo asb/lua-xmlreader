@@ -1,0 +1,1 @@
+Raise a lua_error if the underlying library errors?
