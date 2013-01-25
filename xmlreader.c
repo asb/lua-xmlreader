@@ -647,7 +647,7 @@ static int parser_opt_table;
  * */
 static int get_parser_option(lua_State *L) {
   int i;
-  int len = lua_objlen(L, -1);
+  int len = lua_rawlen(L, -1);
   int opt = 0;
   if (len > 0) {
     lua_pushlightuserdata(L, &parser_opt_table);
@@ -719,7 +719,7 @@ static int xmlreader_from_string(lua_State *L) {
     opt = get_parser_option(L);
   }
 
-  xmlreader xr = push_xmlreader(L, _xmlreader_from_string(str, lua_objlen(L, 1), url, enc, opt));
+  xmlreader xr = push_xmlreader(L, _xmlreader_from_string(str, lua_rawlen(L, 1), url, enc, opt));
 
   if (xr == NULL)
     lua_pushnil(L);
@@ -838,10 +838,10 @@ int luaopen_xmlreader(lua_State *L) {
   luaL_newmetatable(L, LXMLREADER);
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
-  luaL_register(L, NULL, xmlreader_m);
+  luaL_setfuncs(L, xmlreader_m, 0);
 
   lua_newtable(L);
-  luaL_register(L, "xmlreader", xmlreader_f);
+  luaL_setfuncs(L, xmlreader_f, 0);
   
   return 1;
 }
