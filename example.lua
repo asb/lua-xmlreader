@@ -1,6 +1,5 @@
 #! /usr/bin/env lua
 -- See http://xmlsoft.org/xmlreader.html for more examples
-require("xmlreader")
 
 local example_xml = [[
 <?xml version="1.0" encoding="iso-8859-1" ?>
@@ -16,6 +15,7 @@ local example_xml = [[
 </library>
 ]]
 
+local xmlreader = require("xmlreader")
 local r = assert(xmlreader.from_string(example_xml))
 
 while (r:read()) do
