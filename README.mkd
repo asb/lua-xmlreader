@@ -32,7 +32,6 @@ from an XML document using an XmlReader. It prints each element along with its
 attributes.
 
     #! /usr/bin/env lua
-    require('xmlreader')
 
     local example_xml = [[
     <?xml version="1.0" encoding="utf-8"?>
@@ -48,6 +47,7 @@ attributes.
     </library>
     ]]
 
+    local xmlreader = require("xmlreader")
     local r = assert(xmlreader.from_string(example_xml))
 
     while (r:read()) do
