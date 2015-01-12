@@ -5,6 +5,12 @@
 
 #include "error.h"
 
+#if LUA_VERSION_NUM < 502
+  #define LUA_LENGTH(L, I) lua_objlen((L), (I))
+#else
+  #define LUA_LENGTH(L, I) lua_rawlen((L), (I))
+#endif
+
 typedef xmlTextReaderPtr xmlreader;
 
 static const char *const xmlreader_types[] = {
@@ -419,7 +425,7 @@ static int xmlreader_get_attribute(lua_State *L) {
   char *attr;
 
   if (lua_type(L, 2) == LUA_TNUMBER) {
-    int n = luaL_checkint(L, 2);
+    int n = luaL_checkinteger(L, 2);
     attr = (char*)xmlTextReaderGetAttributeNo(xr, n);
   } else {
     const xmlChar *name = (xmlChar*)luaL_checkstring(L, 2);
@@ -479,7 +485,7 @@ static int xmlreader_move_to_attribute(lua_State *L)
   int ret;
 
   if (lua_type(L, 2) == LUA_TNUMBER) {
-    int n = luaL_checkint(L, 2);
+    int n = luaL_checkinteger(L, 2);
     ret = xmlTextReaderMoveToAttributeNo(xr, n);
   } else {
     const xmlChar *name = (xmlChar*)luaL_checkstring(L, 2);
@@ -647,7 +653,7 @@ static int parser_opt_table;
  * */
 static int get_parser_option(lua_State *L) {
   int i;
-  int len = lua_objlen(L, -1);
+  int len = LUA_LENGTH(L, -1);
   int opt = 0;
   if (len > 0) {
     lua_pushlightuserdata(L, &parser_opt_table);
@@ -719,7 +725,7 @@ static int xmlreader_from_string(lua_State *L) {
     opt = get_parser_option(L);
   }
 
-  xmlreader xr = push_xmlreader(L, _xmlreader_from_string(str, lua_objlen(L, 1), url, enc, opt));
+  xmlreader xr = push_xmlreader(L, _xmlreader_from_string(str, LUA_LENGTH(L, 1), url, enc, opt));
 
   if (xr == NULL)
     lua_pushnil(L);
@@ -822,6 +828,18 @@ static struct { const char *key; xmlParserOption value; } parser_opts[] = {
   {NULL, 0}
 };
 
+#if !(LUA_VERSION_NUM < 502)
+static int xmlreader_openf(lua_State *L)
+{
+  lua_newtable(L);
+  lua_pushvalue(L, -2);
+  lua_setfield(L, -2, "module_name");
+
+  luaL_setfuncs(L, xmlreader_f, 0);
+  return 1;
+}
+#endif
+
 int luaopen_xmlreader(lua_State *L) {
   int i;
 
@@ -838,10 +856,15 @@ int luaopen_xmlreader(lua_State *L) {
   luaL_newmetatable(L, LXMLREADER);
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
-  luaL_register(L, NULL, xmlreader_m);
 
+#if LUA_VERSION_NUM < 502
+  luaL_register(L, NULL, xmlreader_m);
   lua_newtable(L);
   luaL_register(L, "xmlreader", xmlreader_f);
+#else
+  luaL_setfuncs(L, xmlreader_m, 0);
+  luaL_requiref (L, "xmlreader",  xmlreader_openf, 1);
+#endif
   
   return 1;
 }
