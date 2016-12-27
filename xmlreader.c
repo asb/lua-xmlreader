@@ -703,7 +703,11 @@ xmlreader _xmlreader_from_string(const char *buffer, int size, const char *URL, 
     xmlFreeParserInputBuffer(buf);
     return (NULL);
   }
+#ifdef xmlTextReaderSetup // or #if LIBXML_VERSION >= 20628
   xmlTextReaderSetup(reader, buf, URL, encoding, options);
+#else
+  xmlReaderNewMemory(reader, buffer, size, URL, encoding, options);
+#end
   return (reader);
 }
 
