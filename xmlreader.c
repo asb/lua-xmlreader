@@ -707,7 +707,7 @@ xmlreader _xmlreader_from_string(const char *buffer, int size, const char *URL, 
   xmlTextReaderSetup(reader, buf, URL, encoding, options);
 #else
   xmlReaderNewMemory(reader, buffer, size, URL, encoding, options);
-#end
+#endif
   return (reader);
 }
 
